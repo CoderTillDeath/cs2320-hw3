@@ -200,25 +200,28 @@ bool topPriority(symb * s)
 
 double eval(stack * s)
 {
-	symb * sym = pop(s);
-	if(sym->isNumber)
-	{
-		return sym->num;
-	}
-	else
-	{
-		switch((int)sym->op)
-		{
-			case 43: return eval(s) + eval(s);
-			 		 break;
-			case 45: return eval(s) - eval(s);
-					 break;
-			case 42: return eval(s) * eval(s);
-					 break;
-			case 47: return eval(s) / eval(s);
-					 break;
-		}
-	}
+    if(!isEmpty(s))
+    {
+    	symb * sym = pop(s);
+    	if(sym->isNumber)
+    	{
+    		return sym->num;
+    	}
+    	else
+	    {
+	    	switch((int)sym->op)
+    		{
+		    	case 43: return eval(s) + eval(s);
+	    		 		 break;
+    			case 45: return eval(s) - eval(s);
+			    		 break;
+		    	case 42: return eval(s) * eval(s);
+	    				 break;
+			    case 47: return eval(s) / eval(s);
+		    			 break;
+	    	}
+    	}
+    }
 }
 
 int main(int argc, char ** argv)
@@ -287,7 +290,10 @@ int main(int argc, char ** argv)
 		push(pop(operators), output);
 	}
 	
-	//printStack(output);
-	cout << eval(output) << endl;
+    if(!isEmpty(output))
+    {
+    	//printStack(output);
+    	cout << eval(output) << endl;
+    }
 }
  
