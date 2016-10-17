@@ -1,0 +1,3 @@
+Olaf	buy	0
+Olaf	times	88
+Olaf	total

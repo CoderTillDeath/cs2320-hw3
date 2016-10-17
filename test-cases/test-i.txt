@@ -1,0 +1,11 @@
+Queen	buy	0
+Queen	add	1
+Queen	add	2
+Queen	add	3
+Queen	add	4
+Queen	add	5
+Queen	add	6
+Queen	times	2
+Queen	add	8
+Queen	add	9
+Queen	total

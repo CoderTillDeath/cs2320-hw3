@@ -1,0 +1,9 @@
+price	candy	4
+Olaf	open	bag
+price	candy	3
+price	simcard	5
+Olaf	buy	5
+Olaf	add	candy
+Olaf	close	bag
+Olaf	discount%	50
+Olaf	total

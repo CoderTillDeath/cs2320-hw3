@@ -1,0 +1,4 @@
+price	plan	100
+Olaf	buy	plan
+Olaf	times	2
+Olaf	total

@@ -1,0 +1,3 @@
+Olaf	buy	12
+Olaf	add	8
+Olaf	total

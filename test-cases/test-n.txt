@@ -1,0 +1,5 @@
+price	charger	12
+Olaf	buy	charger
+price	simcard	8
+Olaf	add	simcard
+Olaf	total

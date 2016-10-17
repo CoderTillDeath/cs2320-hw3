@@ -1,0 +1,9 @@
+Anna	open	bag
+Anna	buy	100
+Anna	discount%	10
+Anna	add	20
+Anna	discount%	50
+Anna	add	35
+Anna	discount%	0
+Anna	close	bag
+Anna	total

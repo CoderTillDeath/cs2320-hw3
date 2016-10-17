@@ -1,0 +1,23 @@
+price	candy	4
+Sven	open	bag
+Sven	open	bag
+Olaf	open	bag
+price	candy	3
+price	simcard	5
+Olaf	buy	5
+Olaf	add	candy
+price	plan	25
+Olaf	close	bag
+Olaf	discount%	50
+price	uhPhone	100
+Sven	buy	uhPhone
+price	adapter	5
+Sven	discount%	5
+Sven	close	bag
+Sven	add	plan
+Sven	discount%	20
+Sven	add	adapter
+Sven	close	bag
+Sven	discount%	10
+Olaf	total
+Sven	total

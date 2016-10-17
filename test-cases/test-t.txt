@@ -1,0 +1,9 @@
+price	plan	100
+price	charger	12
+price	simcard	8
+price	candy	4
+price	candy	3
+price	simcard	5
+price	plan	25
+price	uhPhone	100
+price	adapter	5

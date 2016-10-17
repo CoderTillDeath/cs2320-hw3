@@ -1,0 +1,10 @@
+Queen	open	bag
+Queen	buy	5
+Queen	add	6
+Queen	close	bag
+Queen	times	2
+Queen	add	1
+Queen	add	2
+Queen	add	3
+Queen	add	4
+Queen	total

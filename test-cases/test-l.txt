@@ -1,0 +1,15 @@
+Sven	open	bag
+Sven	open	bag
+Sven	open	bag
+Sven	buy	1
+Sven	add	2
+Sven	close	bag
+Sven	times	2
+Sven	close	bag
+Sven	add	10
+Sven	close	bag
+
+Sven	discount%	25
+
+Sven	times	5
+Sven	total

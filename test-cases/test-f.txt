@@ -1,0 +1,6 @@
+Olaf	open	bag
+Olaf	buy	5
+Olaf	add	3
+Olaf	close	bag
+Olaf	discount%	50
+Olaf	total

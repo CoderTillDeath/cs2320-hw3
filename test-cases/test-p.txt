@@ -1,0 +1,14 @@
+price	plan	25
+Sven	open	bag
+price	uhPhone	100
+Sven	open	bag
+Sven	buy	uhPhone
+Sven	discount%	5
+Sven	close	bag
+Sven	add	plan
+price	adapter	5
+Sven	discount%	20
+Sven	add	adapter
+Sven	close	bag
+Sven	discount%	10
+Sven	total

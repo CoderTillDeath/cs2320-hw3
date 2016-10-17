@@ -1,0 +1,9 @@
+price	plan	100
+price	charger	12
+Olaf	buy	plan
+Olaf	times	2
+Anna	buy	charger
+Olaf	total
+price	simcard	8
+Anna	add	simcard
+Anna	total
