@@ -64,6 +64,18 @@ symb * newSymb(double a)
 	return v;
 }
 
+void printSymb(symb * s)
+{
+	if(s->isNumber)
+	{
+		cout << s->num;
+	}
+	else
+	{
+		cout << s->op;
+	}
+}
+
 struct stack {
 	symb * top;
 };
@@ -95,18 +107,36 @@ void push(symb * v, stack * s)
 	}
 }
 
+void printStack(stack * s)
+{
+	symb * sym = s->top;
+	
+	while(sym)
+	{
+		printSymb(sym);
+		sym = sym->next;
+		cout << " ";
+	}
+	cout << endl;
+}
+
 bool isEmpty(stack * s)
 {
 	return s->top == NULL;
+}
+
+bool isNumber(char c)
+{
+	return (int)c > 47 && (int)c < 58;
 }
 
 lineSplit * split(string line)
 {
 	lineSplit * split = newLineSplit();
 	
-	split->name = before(line, " ");
-	split->op = before(after(line, " "), " ");
-	split->value = after(after(line, " "), " ");
+	split->name = before(line, "\t");
+	split->op = before(after(line, "\t"), "\t");
+	split->value = after(after(line, "\t"), "\t");
 	
 	return split;
 }
@@ -142,17 +172,17 @@ string convertToInfix(string filename)
             
             switch(getTypeStatement(s->op))
             {
-				case open:	
+				case open:	all += "(";
 							break;
-				case close:	
+				case close:	all += ")";
 							break;
-				case buy:	
+				case buy:	all += s->value;
 							break;
-				case add:	
+				case add:	all += "+" + s->value;
 							break;
-				case times:	
+				case times:	all += "*" + s->value;
 							break;
-				case discount:	
+				case discount:	all += "*((100-" + s->value + ")/100)";
 							break;
 				case total:	
 							break;
@@ -163,23 +193,101 @@ string convertToInfix(string filename)
     return all;
 }
 
+bool topPriority(symb * s)
+{
+	return s != NULL && (s->op == '*' || s->op == '/');
+}
+
+double eval(stack * s)
+{
+	symb * sym = pop(s);
+	if(sym->isNumber)
+	{
+		return sym->num;
+	}
+	else
+	{
+		switch((int)sym->op)
+		{
+			case 43: return eval(s) + eval(s);
+			 		 break;
+			case 45: return eval(s) - eval(s);
+					 break;
+			case 42: return eval(s) * eval(s);
+					 break;
+			case 47: return eval(s) / eval(s);
+					 break;
+		}
+	}
+}
+
 int main(int argc, char ** argv)
 {
     string filename = argv[1];
     filename = filename.substr(6);
     
-    ifstream file(filename);
-    string line = "";
-    
-    getline(file,line);
-    lineSplit * s = split(line);
-    
-    cout << s->name << "\t" << s->op << "\t" << s->value << endl;
-    
-    /*
     string infix = convertToInfix(filename);
-
+    
     stack * output = newStack();
-    stack * operators = newStack();*/
+    stack * operators = newStack();
+    
+    bool number = false;
+    int storage = 0;
+    
+    for(int x = 0; x < infix.length(); x++)
+    {
+		char c = infix.at(x);
+		
+		if(isNumber(c))
+		{
+			number = true;
+			storage *= 10;
+			storage += (int) c - 48;
+		}
+		else
+		{
+			if(number)
+			{
+				number = false;
+				push(newSymb((double)storage),output);
+				storage = 0;
+				
+				switch(c)
+				{
+					case '+':	
+					case '-':	
+								while(topPriority(operators->top))
+								{
+									push(pop(operators), output);
+								}
+								push(newSymb(c),operators);
+								break;
+					case '*':	
+					case '/':	
+								push(newSymb(c),operators);
+								break;
+					case '(':	push(newSymb(c),operators);
+								break;
+					case ')':	while(operators->top->op != '(')
+									push(pop(operators), output);
+								pop(operators);
+								break;
+				}
+			}
+		}
+	}
+	
+	if(storage != 0)
+	{
+		push(newSymb((double)storage),output);
+	}
+	
+	while(!isEmpty(operators))
+	{
+		push(pop(operators), output);
+	}
+	
+	//printStack(output);
+	cout << eval(output) << endl;
 }
  
