@@ -46,6 +46,7 @@ Person * newPerson(string name)
 	p->name = name;
 	p->ops = newOperatorStack();
 	p->vals = newValueStack();
+    p->next = NULL;
 	return p;
 }
 
