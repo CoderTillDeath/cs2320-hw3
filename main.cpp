@@ -2,38 +2,6 @@
 #include <fstream>
 using namespace std;
 
-struct EquationNode {
-	char op;
-	double num;
-	bool isNumber;
-	EquationNode * next;
-};
-
-EquationNode * newEqNode(char c)
-{
-	EquationNode * v = new EquationNode;
-	v->next = NULL;
-	v->num = 0;
-	v->op = c;
-	v->isNumber = false;
-	return v;
-}
-
-EquationNode * newEqNode(double a)
-{
-	EquationNode * v = new EquationNode;
-	v->next = NULL;
-	v->num = a;
-	v->op = -1;
-	v->isNumber = true;
-	return v;
-}
-
-struct equation {
-	EquationNode * first;
-	EquationNode * last;
-};
-
 enum type_statement {
 	open,
 	close,
@@ -70,47 +38,37 @@ lineSplit * newLineSplit()
 	return split;
 }
 
-struct symb {
+struct OperatorOrPrice
+{
 	char op;
-	double num;
-	bool isNumber;
-	symb * next;
+	string item;
+	double price;
+	bool isOp;
+	OperatorOrPrice * next;
 };
 
-symb * newSymb(char c)
+OperatorOrPrice * newOpPrice(char op, string s, double price, OperatorOrPrice * next)
 {
-	symb * v = new symb;
-	v->next = NULL;
-	v->num = 0;
-	v->op = c;
-	v->isNumber = false;
+	OperatorOrPrice * v = new OperatorOrPrice;
+	v->op = op;
+	v->item = s;
+	v->price = price;
+	v->next = next;
 	return v;
 }
 
-symb * newSymb(double a)
+OperatorOrPrice * newOpPrice(string s, double price)
 {
-	symb * v = new symb;
-	v->next = NULL;
-	v->num = a;
-	v->op = -1;
-	v->isNumber = true;
-	return v;
+	return newOpPrice(-1, s, price, NULL);
 }
 
-void printSymb(symb * s)
+OperatorOrPrice * newOpPrice(char c)
 {
-	if(s->isNumber)
-	{
-		cout << s->num;
-	}
-	else
-	{
-		cout << s->op;
-	}
+	return newOpPrice(c, NULL, -1, NULL);
 }
 
 struct stack {
-	symb * top;
+	OperatorOrPrice * top;
 };
 
 stack * newStack()
@@ -120,14 +78,14 @@ stack * newStack()
 	return s;
 }
 
-symb * pop(stack * s)
+OperatorOrPrice * pop(stack * s)
 {
-	symb * v = s->top;
+	OperatorOrPrice * v = s->top;
 	s->top = v->next;
 	return v;
 }
 
-void push(symb * v, stack * s)
+void push(OperatorOrPrice * v, stack * s)
 {
 	if(s->top == NULL)
 	{
@@ -138,18 +96,6 @@ void push(symb * v, stack * s)
 		v->next = s->top;
 		s->top = v;
 	}
-}
-
-void printStack(stack * s)
-{
-	symb * sym = s->top;
-	
-	while(sym)
-	{
-		printSymb(sym);
-		sym = sym->next;
-	}
-	cout << endl;
 }
 
 bool isEmpty(stack * s)
@@ -178,8 +124,10 @@ bool equals(string s1, string s2)
 	return s1.compare(s2) == 0;
 }
 
-type_statement getTypeStatement(string s)
+type_statement getTypeStatement(lineSplit * sp)
 {
+	string s = sp->op;
+	string name = sp->name;
 	if(equals(s,"open")) 		return open;
 	if(equals(s,"close")) 		return close;
 	if(equals(s,"buy")) 		return buy;
@@ -187,14 +135,19 @@ type_statement getTypeStatement(string s)
 	if(equals(s,"times")) 		return times;
 	if(equals(s,"discount%")) 	return discount;
 	if(equals(s,"total")) 		return total;
+	if(equals(name,"price")) 	return price;
 }
 
-string convertToInfix(string filename)
+
+int main(int argc, char ** argv)
 {
+    string filename = argv[1];
+    filename = filename.substr(6);
     ifstream file(filename);
     
-    string all = "";
-    string values = "";
+    Prices * prices = newPrices();
+    People * people = newPeople();
+    
     string line = "";
     
     while (getline(file,line))
@@ -203,80 +156,29 @@ string convertToInfix(string filename)
         {
             lineSplit * s = split(line);
             
-            switch(getTypeStatement(s->op))
+            switch(getTypeStatement(s))
             {
-				case open:	all += "(";
+				case price: addPrice(p, s->op, s->value);
 							break;
-				case close:	all += ")";
+				case buy:	pushValue(people, s->name, s->value);
 							break;
-				case buy:	all += s->value;
+				case open:	handleOperator(people, s->name, '(');
 							break;
-				case add:	all += "+" + s->value;
+				case close:	
 							break;
-				case times:	all += "*" + s->value;
+				case add:	
 							break;
-				case discount:	all += "*((100-" + s->value + ")/100)";
+				case buy:	
+							break;
+				case times:	
+							break;
+				case discount:
 							break;
 				case total:	
 							break;
-				case price: 
-							break;
+				
 			}
         }
     }
-    
-    return all;
-}
-
-bool topPriority(symb * s)
-{
-	return s != NULL && (s->op == '*' || s->op == '/');
-}
-
-double eval(stack * s)
-{
-    if(!isEmpty(s))
-    {
-    	symb * sym = pop(s);
-    	if(sym->isNumber)
-    	{
-    		return sym->num;
-    	}
-    	else 
-	    {
-			double e1 = eval(s);
-			double e2 = eval(s);
-	    	switch((int)sym->op)
-    		{
-		    	case 43: return e2 + e1;
-	    		 		 break;
-    			case 45: return e2 - e1;
-			    		 break;
-		    	case 42: return e1 * e2;
-	    				 break;
-			    case 47: return e2 / e1;
-		    			 break;
-	    	}
-    	}
-    }
-}
-
-int main(int argc, char ** argv)
-{
-    string filename = argv[1];
-    filename = filename.substr(6);
-    
-    string infix = convertToInfix(filename);
-    
-    stack * output = newStack();
-    stack * operators = newStack();
-    
-    bool number = false;
-    int storage = 0;
-    
-    for(int x = 0; x < infix.length(); x++)
-    {
-		
-	}
 }
  
