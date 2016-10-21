@@ -38,51 +38,48 @@ lineSplit * newLineSplit()
 	return split;
 }
 
-struct OperatorOrPrice
+struct Operator
 {
 	char op;
-	string item;
-	double price;
-	bool isOp;
 	OperatorOrPrice * next;
 };
 
-OperatorOrPrice * newOpPrice(char op, string s, double price, OperatorOrPrice * next)
+Operator * newOp(char op)
 {
 	OperatorOrPrice * v = new OperatorOrPrice;
 	v->op = op;
-	v->item = s;
-	v->price = price;
-	v->next = next;
+	v->next = NULL;
 	return v;
 }
 
-OperatorOrPrice * newOpPrice(string s, double price)
-{
-	return newOpPrice(-1, s, price, NULL);
-}
-
-OperatorOrPrice * newOpPrice(char c)
-{
-	return newOpPrice(c, NULL, -1, NULL);
-}
-
-struct stack {
-	OperatorOrPrice * top;
+struct OperatorStack {
+	Operator * top;
 };
 
-stack * newStack()
+OperatorStack * newStack()
 {
-	stack * s = new stack;
+	OperatorStack * s = new OperatorStack;
 	s->top = NULL;
 	return s;
 }
 
-OperatorOrPrice * pop(stack * s)
+Operator * pop(stack * s)
 {
-	OperatorOrPrice * v = s->top;
+	Operator * v = s->top;
 	s->top = v->next;
 	return v;
+}
+
+struct Person 
+{
+    OperatorStacki * ops;
+    ValueStack * vals; 
+}
+
+struct People
+{
+    Person * first;
+    Person * last;
 }
 
 void push(OperatorOrPrice * v, stack * s)
@@ -164,17 +161,18 @@ int main(int argc, char ** argv)
 							break;
 				case open:	handleOperator(people, s->name, '(');
 							break;
-				case close:	
+				case close:	handleOperator(people, s->name, ')');
 							break;
-				case add:	
+				case add:	handleOperator(people, s->name, '+');
+                            pushValue(people, s->name, s->value);
 							break;
-				case buy:	
-							break;
-				case times:	
+				case times:	handleOperator(people, s->name, '*');
+                            pushValue(people, s->name, s->value);
 							break;
 				case discount:
+                            handleDiscount(people, s->name, s->value);
 							break;
-				case total:	
+				case total:	getTotal(people,s->name);
 							break;
 				
 			}
