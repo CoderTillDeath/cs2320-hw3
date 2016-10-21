@@ -2,27 +2,26 @@
 #include <fstream>
 using namespace std;
 
-enum type_statement {
-	open,
-	close,
-	buy,
-	add,
-	times,
-	discount,
-	total,
-	price
-};
+// Utilities
+bool equals(string,string);
+string before(string, string);
+string after(string, string);
 
-string before(string s, string b)
-{
-    return s.substr(0,s.find(b));
-}
+// Prices
+struct Prices;
+Prices * newPrices();
+void addPrice(Prices*, string, string);
 
-string after(string s, string b)
-{
-    return s.substr(s.find(b)+1);
-}
+// People
+struct People;
+People * newPeople();
+void pushValue(People*,Prices*,string,string);
+void handleOperator(People*, string, char);
+void handleDiscount(People*, string, string);
+void handleClose(People*,string);
+int getTotal(People*,string);
 
+// LineSplit
 struct lineSplit {
 	string name;
 	string op;
@@ -38,73 +37,6 @@ lineSplit * newLineSplit()
 	return split;
 }
 
-struct Operator
-{
-	char op;
-	OperatorOrPrice * next;
-};
-
-Operator * newOp(char op)
-{
-	OperatorOrPrice * v = new OperatorOrPrice;
-	v->op = op;
-	v->next = NULL;
-	return v;
-}
-
-struct OperatorStack {
-	Operator * top;
-};
-
-OperatorStack * newStack()
-{
-	OperatorStack * s = new OperatorStack;
-	s->top = NULL;
-	return s;
-}
-
-Operator * pop(stack * s)
-{
-	Operator * v = s->top;
-	s->top = v->next;
-	return v;
-}
-
-struct Person 
-{
-    OperatorStacki * ops;
-    ValueStack * vals; 
-}
-
-struct People
-{
-    Person * first;
-    Person * last;
-}
-
-void push(OperatorOrPrice * v, stack * s)
-{
-	if(s->top == NULL)
-	{
-		s->top = v;
-	}
-	else
-	{
-		v->next = s->top;
-		s->top = v;
-	}
-}
-
-bool isEmpty(stack * s)
-{
-	return s->top == NULL;
-}
-
-bool isNumber(char c)
-{
-	return (int)c > 47 && (int)c < 58;
-}
-
 lineSplit * split(string line)
 {
 	lineSplit * split = newLineSplit();
@@ -116,22 +48,29 @@ lineSplit * split(string line)
 	return split;
 }
 
-bool equals(string s1, string s2)
-{
-	return s1.compare(s2) == 0;
-}
+// TypeStatement
+enum type_statement {
+	open,
+	close,
+	buy,
+	add,
+	times,
+	discount,
+	total,
+	price
+};
 
 type_statement getTypeStatement(lineSplit * sp)
 {
-	string s = sp->op;
+	string op = sp->op;
 	string name = sp->name;
-	if(equals(s,"open")) 		return open;
-	if(equals(s,"close")) 		return close;
-	if(equals(s,"buy")) 		return buy;
-	if(equals(s,"add")) 		return add;
-	if(equals(s,"times")) 		return times;
-	if(equals(s,"discount%")) 	return discount;
-	if(equals(s,"total")) 		return total;
+	if(equals(op,"open")) 		return open;
+	if(equals(op,"close")) 		return close;
+	if(equals(op,"buy")) 		return buy;
+	if(equals(op,"add")) 		return add;
+	if(equals(op,"times")) 		return times;
+	if(equals(op,"discount%")) 	return discount;
+	if(equals(op,"total")) 		return total;
 	if(equals(name,"price")) 	return price;
 }
 
@@ -155,24 +94,24 @@ int main(int argc, char ** argv)
             
             switch(getTypeStatement(s))
             {
-				case price: addPrice(p, s->op, s->value);
+				case price: addPrice(prices, s->op, s->value);
 							break;
-				case buy:	pushValue(people, s->name, s->value);
+				case buy:	pushValue(people, prices, s->name, s->value);
 							break;
 				case open:	handleOperator(people, s->name, '(');
 							break;
-				case close:	handleOperator(people, s->name, ')');
+				case close:	handleClose(people, s->name);
 							break;
 				case add:	handleOperator(people, s->name, '+');
-                            pushValue(people, s->name, s->value);
+                            pushValue(people, prices, s->name, s->value);
 							break;
 				case times:	handleOperator(people, s->name, '*');
-                            pushValue(people, s->name, s->value);
+                            pushValue(people, prices, s->name, s->value);
 							break;
 				case discount:
                             handleDiscount(people, s->name, s->value);
 							break;
-				case total:	getTotal(people,s->name);
+				case total:	cout << getTotal(people,s->name) << endl;
 							break;
 				
 			}
