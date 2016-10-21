@@ -2,6 +2,38 @@
 #include <fstream>
 using namespace std;
 
+struct EquationNode {
+	char op;
+	double num;
+	bool isNumber;
+	EquationNode * next;
+};
+
+EquationNode * newEqNode(char c)
+{
+	EquationNode * v = new EquationNode;
+	v->next = NULL;
+	v->num = 0;
+	v->op = c;
+	v->isNumber = false;
+	return v;
+}
+
+EquationNode * newEqNode(double a)
+{
+	EquationNode * v = new EquationNode;
+	v->next = NULL;
+	v->num = a;
+	v->op = -1;
+	v->isNumber = true;
+	return v;
+}
+
+struct equation {
+	EquationNode * first;
+	EquationNode * last;
+};
+
 enum type_statement {
 	open,
 	close,
@@ -9,7 +41,8 @@ enum type_statement {
 	add,
 	times,
 	discount,
-	total
+	total,
+	price
 };
 
 string before(string s, string b)
@@ -115,7 +148,6 @@ void printStack(stack * s)
 	{
 		printSymb(sym);
 		sym = sym->next;
-		cout << " ";
 	}
 	cout << endl;
 }
@@ -162,6 +194,7 @@ string convertToInfix(string filename)
     ifstream file(filename);
     
     string all = "";
+    string values = "";
     string line = "";
     
     while (getline(file,line))
@@ -186,6 +219,8 @@ string convertToInfix(string filename)
 							break;
 				case total:	
 							break;
+				case price: 
+							break;
 			}
         }
     }
@@ -207,17 +242,19 @@ double eval(stack * s)
     	{
     		return sym->num;
     	}
-    	else
+    	else 
 	    {
+			double e1 = eval(s);
+			double e2 = eval(s);
 	    	switch((int)sym->op)
     		{
-		    	case 43: return eval(s) + eval(s);
+		    	case 43: return e2 + e1;
 	    		 		 break;
-    			case 45: return eval(s) - eval(s);
+    			case 45: return e2 - e1;
 			    		 break;
-		    	case 42: return eval(s) * eval(s);
+		    	case 42: return e1 * e2;
 	    				 break;
-			    case 47: return eval(s) / eval(s);
+			    case 47: return e2 / e1;
 		    			 break;
 	    	}
     	}
@@ -239,61 +276,7 @@ int main(int argc, char ** argv)
     
     for(int x = 0; x < infix.length(); x++)
     {
-		char c = infix.at(x);
 		
-		if(isNumber(c))
-		{
-			number = true;
-			storage *= 10;
-			storage += (int) c - 48;
-		}
-		else
-		{
-			if(number)
-			{
-				number = false;
-				push(newSymb((double)storage),output);
-				storage = 0;
-				
-				switch(c)
-				{
-					case '+':	
-					case '-':	
-								while(topPriority(operators->top))
-								{
-									push(pop(operators), output);
-								}
-								push(newSymb(c),operators);
-								break;
-					case '*':	
-					case '/':	
-								push(newSymb(c),operators);
-								break;
-					case '(':	push(newSymb(c),operators);
-								break;
-					case ')':	while(operators->top->op != '(')
-									push(pop(operators), output);
-								pop(operators);
-								break;
-				}
-			}
-		}
 	}
-	
-	if(storage != 0)
-	{
-		push(newSymb((double)storage),output);
-	}
-	
-	while(!isEmpty(operators))
-	{
-		push(pop(operators), output);
-	}
-	
-    if(!isEmpty(output))
-    {
-    	//printStack(output);
-    	cout << eval(output) << endl;
-    }
 }
  
